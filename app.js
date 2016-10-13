@@ -11,30 +11,32 @@ var bodyParser = require('body-parser');
 
 // });
 
+var config = {
+	apiKey: "AIzaSyAq4VZqZ2yC5JLioLbdLRIJ2JPh0oW1r7w",
+	authDomain: "sabps-cd1b7.firebaseapp.com",
+	databaseURL: "https://sabps-cd1b7.firebaseio.com",
+	storageBucket: "sabps-cd1b7.appspot.com",
+	messagingSenderId: "881638063284"
+};
+firebase.initializeApp(config);
+
+var smtpConfig = {
+	host: 'smtp.office365.com',
+	port: 587,
+	secure: false, // use SSL
+	auth: {
+		user: 'manolis.ioannides@mazdis.com',
+		pass: 'Joannakrupa_9'
+	}
+};
+
+var transporter = nodemailer.createTransport(smtpConfig);
+
+
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
 
-	var config = {
-		apiKey: "AIzaSyAq4VZqZ2yC5JLioLbdLRIJ2JPh0oW1r7w",
-		authDomain: "sabps-cd1b7.firebaseapp.com",
-		databaseURL: "https://sabps-cd1b7.firebaseio.com",
-		storageBucket: "sabps-cd1b7.appspot.com",
-		messagingSenderId: "881638063284"
-	};
-	firebase.initializeApp(config);
-
-	var smtpConfig = {
-		host: 'smtp.office365.com',
-		port: 587,
-		secure: false, // use SSL
-		auth: {
-			user: 'manolis.ioannides@mazdis.com',
-			pass: 'Joannakrupa_9'
-		}
-	};
-
-	var transporter = nodemailer.createTransport(smtpConfig);
 
 	firebase.database().ref().child('Emails to Send').on('child_changed', function(emailSnap) {
 		var email = emailSnap.val();
