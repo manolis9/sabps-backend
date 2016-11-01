@@ -37,7 +37,6 @@ app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
 
-
 	firebase.database().ref().child('Emails to Send').on('child_changed', function(emailSnap) {
 		var email = emailSnap.val();
 		//sendEmailHelper(email.from, email.to, email.subject, email.body);
@@ -67,9 +66,25 @@ app.get('/', function(req, res) {
 
 	});
 
-	res.send('MAZDIS - SABPS');
+	firebase.database().ref().child('Reset Password Email').on('child_changed', function(email) {
+		var userEmail = email.val();
+
+		var ref = new Firebase("https://sabps-cd1b7.firebaseio.com");
+		ref.resetPassword({
+			email: userEmail
+		}, function(error) {
+			if (error === null) {
+				console.log("Password reset email sent successfully");
+			} else {
+				console.log("Error sending password reset email:", error);
+			}
+		});
+	});
+
+res.send('MAZDIS - SABPS');
 
 });
+
 
 app.listen(PORT, function() {
 	console.log('Express listening on port: ' + PORT + '!');
