@@ -69,15 +69,12 @@ app.get('/', function(req, res) {
 	firebase.database().ref().child('Reset Password Email').on('child_changed', function(email) {
 		var userEmail = email.val();
 
-		var ref = new Firebase("https://sabps-cd1b7.firebaseio.com");
-		ref.resetPassword({
-			email: userEmail
+		var auth = firebase.auth();
+
+		auth.sendPasswordResetEmail(userEmail).then(function() {
+		  // Email sent.
 		}, function(error) {
-			if (error === null) {
-				console.log("Password reset email sent successfully");
-			} else {
-				console.log("Error sending password reset email:", error);
-			}
+		  // An error happened.
 		});
 	});
 
