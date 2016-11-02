@@ -32,11 +32,24 @@ var smtpConfig = {
 
 var transporter = nodemailer.createTransport(smtpConfig);
 
-
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
 
+		/* Forgot password: send a reset password email*/
+		firebase.database().ref().child('Reset Password Email').on('child_changed', function(email) {
+		var userEmail = email.val();
+
+		var auth = firebase.auth();
+
+		auth.sendPasswordResetEmail('manioannides@gmail.com').then(function() {
+		  // Email sent.
+		}, function(error) {
+		  // An error happened.
+		});
+	});
+
+	/* Booking confirmation, completion, cancellation and registration confirmation emails*/
 	firebase.database().ref().child('Emails to Send').on('child_changed', function(emailSnap) {
 		var email = emailSnap.val();
 		//sendEmailHelper(email.from, email.to, email.subject, email.body);
@@ -66,17 +79,6 @@ app.get('/', function(req, res) {
 
 	});
 
-	firebase.database().ref().child('Reset Password Email').on('child_changed', function(email) {
-		var userEmail = email.val();
-
-		var auth = firebase.auth();
-
-		auth.sendPasswordResetEmail(userEmail).then(function() {
-		  // Email sent.
-		}, function(error) {
-		  // An error happened.
-		});
-	});
 
 res.send('MAZDIS - SABPS');
 
