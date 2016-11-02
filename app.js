@@ -39,10 +39,10 @@ app.get('/', function(req, res) {
 		/* Forgot password: send a reset password email*/
 		firebase.database().ref().child('Reset Password Email').on('child_changed', function(email) {
 		var userEmail = email.val();
-
+	
 		var auth = firebase.auth();
 
-		auth.sendPasswordResetEmail('manioannides@gmail.com').then(function() {
+		auth.sendPasswordResetEmail(userEmail).then(function() {
 		  // Email sent.
 		}, function(error) {
 		  // An error happened.
@@ -73,11 +73,8 @@ app.get('/', function(req, res) {
 			console.log('Message sent: ' + info.response);
 		});
 
-		// firebase.database().ref().child('Emails to send').off("child_changed");
-		// Remove it now that we've processed it.
-		// firebase.database().ref().child('Emails to send').child('email').remove();
-
 	});
+
 
 
 res.send('MAZDIS - SABPS');
