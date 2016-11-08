@@ -74,34 +74,6 @@ app.get('/', function(req, res) {
 		console.log("Customer charged!");
 	});
 
-
-	// /* Charge the user's credit card for his booking*/
-	// firebase.database().ref().child('token').on('child_changed', function(tokenid) {
-	// 	var tid = tokenid.val();
-
-	// 	console.log(tid.id);
-
-
-	// 	stripe.tokens.retrieve(tid.id, function(err, tok) {
-	// 		console.log(tok);
-
-	// 		var charge = stripe.charges.create({
-	// 			amount: 1000, // Amount in cents
-	// 			currency: "cad",
-	// 			source: tok,
-	// 			description: "Example charge"
-	// 		}, function(err, charge) {
-	// 			if (err && err.type === 'StripeCardError') {
-	// 				// The card has been declined
-	// 			} else {
-	// 				console.log("Card was charged")
-	// 			}
-	// 		});
-
-	// 	});
-
-	// });
-
 	/* Booking confirmation, completion, cancellation and registration confirmation emails*/
 	firebase.database().ref().child('Emails to Send').on('child_changed', function(emailSnap) {
 		var email = emailSnap.val();
@@ -127,8 +99,6 @@ app.get('/', function(req, res) {
 		});
 
 	});
-
-
 
 	res.send('MAZDIS - SABPS');
 
