@@ -2,8 +2,10 @@ var express = require('express');
 var app = express();
 var firebase = require('firebase');
 var nodemailer = require('nodemailer');
-var PORT = process.env.PORT || 3000;
+var PORT = 3000;
 var bodyParser = require('body-parser');
+var stripe = require('stripe')(
+	'sk_test_2ERBbuikr3Ul5YmPVNBvGg9V');
 
 // firebase.initializeApp({
 // 	serviceAccount: "./app/SABPS-595760d743f6.json",
@@ -36,18 +38,69 @@ app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
 
-		/* Forgot password: send a reset password email*/
-		firebase.database().ref().child('Reset Password Email').on('child_changed', function(email) {
-		var userEmail = email.val();
-	
-		var auth = firebase.auth();
+	/*Create a new customer*/
+	firebase.database().ref().child('new customer').on('child_changed', function(customer) {
+		var cust = customer.val();
 
-		auth.sendPasswordResetEmail(userEmail).then(function() {
-		  // Email sent.
-		}, function(error) {
-		  // An error happened.
+		userId = cust.uid;
+		stripe.customers.create({
+			source: cust.tokenId,
+			description: cust.email
+		}).then(function(customer) {
+			var customerId = customer.id
+
+
+			firebase.database().ref().child('Users').child(userId).child('customerId').set(customerId);
 		});
+
+		console.log("Customer created!");
+
 	});
+
+	/*Charge a customer*/
+	firebase.database().ref().child('charge customer').on('child_changed', function(customer) {
+		var cust = customer.val();
+
+		var customerId = cust.customerId;
+		var amount = parseFloat(cust.amount);
+		amount = amount*100;
+
+		stripe.charges.create({
+			amount: amount, // Amount in cents
+			currency: "cad",
+			customer: customerId // Previously stored, then retrieved
+		});
+
+		console.log("Customer charged!");
+	});
+
+
+	// /* Charge the user's credit card for his booking*/
+	// firebase.database().ref().child('token').on('child_changed', function(tokenid) {
+	// 	var tid = tokenid.val();
+
+	// 	console.log(tid.id);
+
+
+	// 	stripe.tokens.retrieve(tid.id, function(err, tok) {
+	// 		console.log(tok);
+
+	// 		var charge = stripe.charges.create({
+	// 			amount: 1000, // Amount in cents
+	// 			currency: "cad",
+	// 			source: tok,
+	// 			description: "Example charge"
+	// 		}, function(err, charge) {
+	// 			if (err && err.type === 'StripeCardError') {
+	// 				// The card has been declined
+	// 			} else {
+	// 				console.log("Card was charged")
+	// 			}
+	// 		});
+
+	// 	});
+
+	// });
 
 	/* Booking confirmation, completion, cancellation and registration confirmation emails*/
 	firebase.database().ref().child('Emails to Send').on('child_changed', function(emailSnap) {
@@ -77,7 +130,7 @@ app.get('/', function(req, res) {
 
 
 
-res.send('MAZDIS - SABPS');
+	res.send('MAZDIS - SABPS');
 
 });
 
