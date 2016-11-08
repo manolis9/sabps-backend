@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var firebase = require('firebase');
 var nodemailer = require('nodemailer');
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 var bodyParser = require('body-parser');
 var stripe = require('stripe')(
 	'sk_test_2ERBbuikr3Ul5YmPVNBvGg9V');
