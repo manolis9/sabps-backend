@@ -13,13 +13,22 @@ var stripe = require('stripe')(
 
 // });
 
+// var config = {
+// 	apiKey: "AIzaSyAq4VZqZ2yC5JLioLbdLRIJ2JPh0oW1r7w",
+// 	authDomain: "sabps-cd1b7.firebaseapp.com",
+// 	databaseURL: "https://sabps-cd1b7.firebaseio.com",
+// 	storageBucket: "sabps-cd1b7.appspot.com",
+// 	messagingSenderId: "881638063284"
+// };
+
 var config = {
-	apiKey: "AIzaSyAq4VZqZ2yC5JLioLbdLRIJ2JPh0oW1r7w",
-	authDomain: "sabps-cd1b7.firebaseapp.com",
-	databaseURL: "https://sabps-cd1b7.firebaseio.com",
-	storageBucket: "sabps-cd1b7.appspot.com",
-	messagingSenderId: "881638063284"
+    apiKey: "AIzaSyDI5gkDdas1zz45zhbP34xJ8_V8ZbawGag",
+    authDomain: "mazdis-sabps.firebaseapp.com",
+    databaseURL: "https://mazdis-sabps.firebaseio.com",
+    storageBucket: "mazdis-sabps.appspot.com",
+    messagingSenderId: "1068216834283"
 };
+
 firebase.initializeApp(config);
 
 var smtpConfig = {
@@ -49,7 +58,6 @@ app.get('/', function(req, res) {
 		}).then(function(customer) {
 			var customerId = customer.id
 
-
 			firebase.database().ref().child('Users').child(userId).child('customerId').set(customerId);
 		});
 
@@ -75,7 +83,7 @@ app.get('/', function(req, res) {
 	});
 
 	/* Booking confirmation, completion, cancellation and registration confirmation emails*/
-	firebase.database().ref().child('Emails to Send').on('child_changed', function(emailSnap) {
+	firebase.database().ref().child('emails').child('email to send').on('child_changed', function(emailSnap) {
 		var email = emailSnap.val();
 		//sendEmailHelper(email.from, email.to, email.subject, email.body);
 		console.log(email.from);
@@ -103,7 +111,6 @@ app.get('/', function(req, res) {
 	res.send('MAZDIS - SABPS');
 
 });
-
 
 app.listen(PORT, function() {
 	console.log('Express listening on port: ' + PORT + '!');
