@@ -71,7 +71,8 @@ app.get('/', function(req, res) {
 
 		var customerId = cust.customerId;
 		var amount = parseFloat(cust.amount);
-		amount = amount*1000;
+		amount = amount*100;
+		amount = amount.toFixed(2);
 
 		stripe.charges.create({
 			amount: amount, // Amount in cents
