@@ -58,7 +58,7 @@ app.get('/', function(req, res) {
 		}).then(function(customer) {
 			var customerId = customer.id
 
-			firebase.database().ref().child('Users').child(userId).child('customerId').set(customerId);
+			firebase.database().ref().child('users').child(userId).child('customerId').set(customerId);
 		});
 
 		console.log("Customer created!");
