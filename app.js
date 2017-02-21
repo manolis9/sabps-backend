@@ -48,7 +48,7 @@ app.use(bodyParser.json());
 app.get('/', function(req, res) {
 
 	/*Create a new customer*/
-	firebase.database().ref().child('billing').on('child_changed', function(customer) {
+	firebase.database().ref().child('billing').child('new customer').on('child_changed', function(customer) {
 		var cust = customer.val();
 
 		userId = cust.uid;
