@@ -48,7 +48,7 @@ app.use(bodyParser.json());
 app.get('/', function(req, res) {
 
 	/*Create a new customer*/
-	firebase.database().ref().child('new customer').on('child_changed', function(customer) {
+	firebase.database().ref().child('billing').child('new customer').on('child_changed', function(customer) {
 		var cust = customer.val();
 
 		userId = cust.uid;
@@ -66,7 +66,7 @@ app.get('/', function(req, res) {
 	});
 
 	/*Charge a customer*/
-	firebase.database().ref().child('charge customer').on('child_changed', function(customer) {
+	firebase.database().ref().child('billing').child('charge customer').on('child_changed', function(customer) {
 		var cust = customer.val();
 
 		var customerId = cust.customerId;
