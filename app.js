@@ -22,11 +22,11 @@ var stripe = require('stripe')(
 // };
 
 var config = {
-    apiKey: "AIzaSyDI5gkDdas1zz45zhbP34xJ8_V8ZbawGag",
-    authDomain: "mazdis-sabps.firebaseapp.com",
-    databaseURL: "https://mazdis-sabps.firebaseio.com",
-    storageBucket: "mazdis-sabps.appspot.com",
-    messagingSenderId: "1068216834283"
+	apiKey: "AIzaSyDI5gkDdas1zz45zhbP34xJ8_V8ZbawGag",
+	authDomain: "mazdis-sabps.firebaseapp.com",
+	databaseURL: "https://mazdis-sabps.firebaseio.com",
+	storageBucket: "mazdis-sabps.appspot.com",
+	messagingSenderId: "1068216834283"
 };
 
 firebase.initializeApp(config);
@@ -66,18 +66,22 @@ app.get('/', function(req, res) {
 	});
 
 	/*Charge a customer*/
-	firebase.database().ref().child('billing').child('charge customer').on('child_added', function(customer) {
+	var chargeCustomerRef = firebase.database().ref().child('billing').child('charge customer');
+	chargeCustomerRef.on('child_added', function(customer) {
 		var cust = customer.val();
 
 		var customerId = cust.customerId;
 		var amount = parseFloat(cust.amount);
-		amount = amount*1000;
+		amount = amount * 1000;
 
 		stripe.charges.create({
-			amount: amount, // Amount in cents
-			currency: "cad",
-			customer: customerId // Previously stored, then retrieved
-		});
+				amount: amount, // Amount in cents
+				currency: "cad",
+				customer: customerId // Previously stored, then retrieved
+			})
+			.then(function() {
+				chargeCustomerRef.child(cust.customerId).remove();
+			});
 
 		console.log("Customer charged!");
 	});
