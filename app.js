@@ -66,7 +66,7 @@ app.get('/', function(req, res) {
 	});
 
 	/*Charge a customer*/
-	firebase.database().ref().child('billing').child('charge customer').on('child_changed', function(customer) {
+	firebase.database().ref().child('billing').child('charge customer').on('child_added', function(customer) {
 		var cust = customer.val();
 
 		var customerId = cust.customerId;
