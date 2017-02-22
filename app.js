@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var firebase = require('firebase');
 var nodemailer = require('nodemailer');
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 4200;
 var bodyParser = require('body-parser');
 var stripe = require('stripe')(
 	'sk_test_2ERBbuikr3Ul5YmPVNBvGg9V');
@@ -62,7 +62,7 @@ app.get('/', function(req, res) {
 			newCustomerRef.child(key).remove();
 			firebase.database().ref().child('users').child(userId).child('customerId').set(customerId);
 		}).catch(function(err){
-				console.log('Error in Charging Customer:', err.message);
+				console.log('Error in Creating New Customer:', err.message);
 		});
 
 		console.log("Customer created!");
