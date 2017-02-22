@@ -48,16 +48,18 @@ app.use(bodyParser.json());
 app.get('/', function(req, res) {
 
 	/*Create a new customer*/
-	firebase.database().ref().child('billing').child('new customer').on('child_changed', function(customer) {
+	var newCustomerRef = firebase.database().ref().child('billing').child('new customer');
+	newCustomerRef.on('child_added', function(customer) {
 		var cust = customer.val();
+		var key = customer.getKey();
 
 		userId = cust.uid;
 		stripe.customers.create({
 			source: cust.tokenId,
 			description: cust.email
-		}).then(function(customer) {
-			var customerId = customer.id
-
+		}).then(function(StripeCustomer) {
+			var customerId = StripeCustomer.id
+			newCustomerRef.child(key).remove();
 			firebase.database().ref().child('users').child(userId).child('customerId').set(customerId);
 		});
 
@@ -88,8 +90,11 @@ app.get('/', function(req, res) {
 	});
 
 	/* Booking confirmation, completion, cancellation and registration confirmation emails*/
-	firebase.database().ref().child('emails').child('email to send').on('child_changed', function(emailSnap) {
+	var emailRef = firebase.database().ref().child('emails').child('email to send');
+	emailRef.on('child_added', function(emailSnap) {
 		var email = emailSnap.val();
+		var key = emailSnap.getKey();
+
 		//sendEmailHelper(email.from, email.to, email.subject, email.body);
 		console.log(email.from);
 		console.log(email.to);
@@ -109,6 +114,9 @@ app.get('/', function(req, res) {
 				return console.log(error);
 			}
 			console.log('Message sent: ' + info.response);
+		})
+		.then(function() {
+			emailRef.child(key).remove();
 		});
 
 	});
