@@ -69,6 +69,7 @@ app.get('/', function(req, res) {
 	var chargeCustomerRef = firebase.database().ref().child('billing').child('charge customer');
 	chargeCustomerRef.on('child_added', function(customer) {
 		var cust = customer.val();
+		var key = customer.getKey().toString();
 
 		var customerId = cust.customerId;
 		var amount = parseFloat(cust.amount);
@@ -80,7 +81,7 @@ app.get('/', function(req, res) {
 				customer: customerId // Previously stored, then retrieved
 			})
 			.then(function() {
-				chargeCustomerRef.child(cust.customerId).remove();
+				chargeCustomerRef.child(key).remove();
 			});
 
 		console.log("Customer charged!");
