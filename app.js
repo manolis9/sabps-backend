@@ -61,6 +61,8 @@ app.get('/', function(req, res) {
 			var customerId = StripeCustomer.id
 			newCustomerRef.child(key).remove();
 			firebase.database().ref().child('users').child(userId).child('customerId').set(customerId);
+		}).catch(function(err){
+				console.log('Error in Charging Customer:', err.message);
 		});
 
 		console.log("Customer created!");
@@ -82,15 +84,12 @@ app.get('/', function(req, res) {
 				amount: amount, // Amount in cents
 				currency: "cad",
 				customer: customerId // Previously stored, then retrieved
-			})
-			.then(function() {
+			}).then(function() {
 				chargeCustomerRef.child(key).remove();
-			})
-			.catch(function(err){
+				console.log("Customer charged!");
+			}).catch(function(err){
 				console.log('Error in Charging Customer:', err.message);
 			});
-
-		console.log("Customer charged!");
 	});
 
 	/* Booking confirmation, completion, cancellation and registration confirmation emails*/
