@@ -85,7 +85,7 @@ app.get('/', function(req, res) {
 			.then(function() {
 				chargeCustomerRef.child(key).remove();
 			})
-			.catch(functino(err){
+			.catch(function(err){
 				console.log(err.message);
 			};
 
