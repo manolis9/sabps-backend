@@ -72,6 +72,7 @@ app.get('/', function(req, res) {
 	chargeCustomerRef.on('child_added', function(customer) {
 		var cust = customer.val();
 		var key = customer.getKey();
+		console.log('CUSTOMER KEY:', key);
 
 		var customerId = cust.customerId;
 		var amount = parseFloat(cust.amount);
@@ -86,7 +87,7 @@ app.get('/', function(req, res) {
 				chargeCustomerRef.child(key).remove();
 			})
 			.catch(function(err){
-				console.log(err.message);
+				console.log('Error in Charging Customer:', err.message);
 			});
 
 		console.log("Customer charged!");
