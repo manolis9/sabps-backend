@@ -113,10 +113,8 @@ app.get('/', function(req, res) {
 			if (error) {
 				return console.log(error);
 			}
-			console.log('Message sent: ' + info.response);
-		})
-		.then(function() {
 			emailRef.child(key).remove();
+			console.log('Message sent: ' + info.response);
 		});
 
 	});
