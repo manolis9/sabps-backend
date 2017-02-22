@@ -87,7 +87,7 @@ app.get('/', function(req, res) {
 			})
 			.catch(function(err){
 				console.log(err.message);
-			};
+			});
 
 		console.log("Customer charged!");
 	});
