@@ -45,11 +45,11 @@ var transporter = nodemailer.createTransport(smtpConfig);
 
 app.use(bodyParser.json());
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
 
 	/*Create a new customer*/
 	var newCustomerRef = firebase.database().ref().child('billing').child('new customer');
-	newCustomerRef.on('child_added', function(customer) {
+	newCustomerRef.on('child_added', function (customer) {
 		var cust = customer.val();
 		var key = customer.getKey();
 
@@ -57,12 +57,12 @@ app.get('/', function(req, res) {
 		stripe.customers.create({
 			source: cust.tokenId,
 			description: cust.email
-		}).then(function(StripeCustomer) {
+		}).then(function (StripeCustomer) {
 			var customerId = StripeCustomer.id
 			newCustomerRef.child(key).remove();
 			firebase.database().ref().child('users').child(userId).child('customerId').set(customerId);
-		}).catch(function(err){
-				console.log('Error in Creating New Customer:', err.message);
+		}).catch(function (err) {
+			console.log('Error in Creating New Customer:', err.message);
 		});
 
 		console.log("Customer created!");
@@ -71,30 +71,73 @@ app.get('/', function(req, res) {
 
 	/*Charge a customer*/
 	var chargeCustomerRef = firebase.database().ref().child('billing').child('charge customer');
-	chargeCustomerRef.on('child_added', function(customer) {
+	chargeCustomerRef.on('child_added', function (customer) {
 		var cust = customer.val();
 		var key = customer.getKey();
-		console.log('CUSTOMER KEY:', key);
-
 		var customerId = cust.customerId;
 		var amount = parseFloat(cust.amount);
 		amount = amount * 1000;
 
 		stripe.charges.create({
-				amount: amount, // Amount in cents
-				currency: "cad",
-				customer: customerId // Previously stored, then retrieved
-			}).then(function() {
-				chargeCustomerRef.child(key).remove();
-				console.log("Customer charged!");
-			}).catch(function(err){
-				console.log('Error in Charging Customer:', err.message);
-			});
+			amount: amount, // Amount in cents
+			currency: "cad",
+			customer: customerId // Previously stored, then retrieved
+		}).then(function () {
+			chargeCustomerRef.child(key).remove();
+			console.log("Customer charged!");
+		}).catch(function (err) {
+			console.log('Error in Charging Customer:', err.message);
+		});
 	});
+
+	/*Create a new invoice*/
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth() + 1; //January is 0!
+	var yyyy = today.getFullYear();
+
+	if (dd < 10) {
+		dd = '0' + dd
+	}
+
+	if (mm < 10) {
+		mm = '0' + mm
+	}
+
+	today = mm + '/' + dd + '/' + yyyy;
+	if (today == "02/27/2017") {
+		var userRef = firebase.database().ref().child('users');
+		userRef.on('child_added', function (user) {
+
+			var usr = user.val();
+			console.log("User: ", usr);
+			var userId = user.getKey();
+			var newInvoiceRef = userRef.child(userId).child('invoice to pay');
+
+			var currInvoiceRef = userRef.child(userId).child('current invoice');
+			currInvoiceRef.once('value', function (invoice) {
+
+				newInvoiceRef.push(invoice);
+				// .then(function () {
+				currInvoiceRef.remove();
+				// })
+				// .catch(function (err) {
+				// 	console.log('could not create invoice to pay ref: ', err.message);
+				// });
+
+			}).catch(function (err) {
+				console.log('could not read from current invoice ref:', err.message);
+			});
+
+			console.log("invoice to pay ref created!");
+
+		});
+	}
+
 
 	/* Booking confirmation, completion, cancellation and registration confirmation emails*/
 	var emailRef = firebase.database().ref().child('emails').child('email to send');
-	emailRef.on('child_added', function(emailSnap) {
+	emailRef.on('child_added', function (emailSnap) {
 		var email = emailSnap.val();
 		var key = emailSnap.getKey();
 
@@ -112,7 +155,7 @@ app.get('/', function(req, res) {
 			html: '<b>' + email.body.toString() + '</b>' // html body
 		}
 
-		transporter.sendMail(mailOptions, function(error, info) {
+		transporter.sendMail(mailOptions, function (error, info) {
 			if (error) {
 				return console.log(error);
 			}
@@ -126,6 +169,6 @@ app.get('/', function(req, res) {
 
 });
 
-app.listen(PORT, function() {
+app.listen(PORT, function () {
 	console.log('Express listening on port: ' + PORT + '!');
 });
